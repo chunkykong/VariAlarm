@@ -874,3 +874,24 @@ document.addEventListener('visibilitychange', () => {
 if ('Notification' in window && Notification.permission === 'default') {
     Notification.requestPermission();
 }
+// Add this to your app.js file:
+document.addEventListener('DOMContentLoaded', function() {
+    // Remove restrictions from all time inputs
+    const timeInputs = document.querySelectorAll('input[type="time"]');
+    timeInputs.forEach(input => {
+        input.removeAttribute('min');
+        input.removeAttribute('max');
+        input.removeAttribute('pattern');
+        input.removeAttribute('maxlength');
+        
+        // Remove any input event listeners that restrict values
+        input.addEventListener('input', function(e) {
+            // Allow any valid time format
+            const time = this.value;
+            if (time.match(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)) {
+                // Valid time format, don't change it
+                return;
+            }
+        });
+    });
+});
