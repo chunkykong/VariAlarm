@@ -1,0 +1,8 @@
+{
+  "name": "VariAlarm",
+  "theme_color": "#21808d",
+  "background_color": "#21808d",
+  "short_name": "VariAlarm",
+  "id": "VariAlarm",
+  "description": "Smart alarm clock with rotating sounds that change every 2 days. Never get used to the same alarm sound again! Features multiple alarms, custom scheduling, and modern UI design."
+}
