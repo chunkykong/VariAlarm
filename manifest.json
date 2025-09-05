@@ -1,4 +1,6 @@
 {
+  "start_url": "/",
+  "display": "standalone",
   "name": "VariAlarm",
   "theme_color": "#21808d",
   "background_color": "#21808d",
