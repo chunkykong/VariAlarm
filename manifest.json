@@ -1,22 +1,35 @@
 {
   "name": "Rotating Alarm Clock",
-  "short_name": "AlarmClock",
-  "start_url": "/",
+  "short_name": "AlarmClock", 
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#21808D",
   "theme_color": "#21808D",
   "description": "Smart alarm clock with rotating sounds that change every 2 days",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "./icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "icon-512.png",
+      "src": "./icon-192.png",
+      "sizes": "192x192", 
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./icon-512.png", 
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png", 
+      "purpose": "maskable"
     }
   ]
 }
