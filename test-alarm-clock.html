@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alarm Clock Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .time-display {
+            text-align: center;
+            font-size: 48px;
+            font-weight: bold;
+            color: #21808D;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin: 20px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        button {
+            background: #21808D;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #1a6b75;
+        }
+        .alarm-list {
+            margin-top: 30px;
+        }
+        .alarm-item {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border-left: 4px solid #21808D;
+        }
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-top: 10px;
+        }
+        .day-checkbox {
+            text-align: center;
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .day-checkbox input[type="checkbox"] {
+            display: none;
+        }
+        .day-checkbox.selected {
+            background: #21808D;
+            color: white;
+            border-color: #21808D;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🕒 Rotating Alarm Clock</h1>
+        
+        <!-- Current Time -->
+        <div class="time-display" id="currentTime">12:00:00</div>
+        
+        <!-- Rotation Info -->
+        <div style="text-align: center; margin: 20px 0; padding: 15px; background: #e8f4f6; border-radius: 5px;">
+            <strong>Current Alarm Sound: </strong><span id="currentSound">Classic Beep</span><br>
+            <small>Changes every 2 days automatically</small>
+        </div>
+        
+        <!-- Add Alarm Form -->
+        <h3>Add New Alarm</h3>
+        <form id="alarmForm">
+            <div class="form-group">
+                <label>Time:</label>
+                <input type="time" id="alarmTime" value="07:00" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Label:</label>
+                <input type="text" id="alarmLabel" placeholder="My Alarm" maxlength="30">
+            </div>
+            
+            <div class="form-group">
+                <label>Days:</label>
+                <div class="days-grid">
+                    <label class="day-checkbox" data-day="mon">
+                        <input type="checkbox" value="mon">Mon
+                    </label>
+                    <label class="day-checkbox" data-day="tue">
+                        <input type="checkbox" value="tue">Tue
+                    </label>
+                    <label class="day-checkbox" data-day="wed">
+                        <input type="checkbox" value="wed">Wed
+                    </label>
+                    <label class="day-checkbox" data-day="thu">
+                        <input type="checkbox" value="thu">Thu
+                    </label>
+                    <label class="day-checkbox" data-day="fri">
+                        <input type="checkbox" value="fri">Fri
+                    </label>
+                    <label class="day-checkbox" data-day="sat">
+                        <input type="checkbox" value="sat">Sat
+                    </label>
+                    <label class="day-checkbox" data-day="sun">
+                        <input type="checkbox" value="sun">Sun
+                    </label>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Sound:</label>
+                <select id="alarmSound">
+                    <option value="rotating">Rotating Sound (Auto-changes)</option>
+                    <option value="beep">Classic Beep</option>
+                    <option value="chime">Gentle Chimes</option>
+                    <option value="bell">Digital Bell</option>
+                </select>
+            </div>
+            
+            <button type="submit">Save Alarm</button>
+        </form>
+        
+        <!-- Alarms List -->
+        <div class="alarm-list">
+            <h3>Your Alarms</h3>
+            <div id="alarmsList">
+                <p style="text-align: center; color: #666;">No alarms set. Add one above!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let alarms = JSON.parse(localStorage.getItem('testAlarms') || '[]');
+        
+        // Update time every second
+        function updateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString();
+            document.getElementById('currentTime').textContent = timeStr;
+            setTimeout(updateTime, 1000);
+        }
+        
+        // Start time updates
+        updateTime();
+        
+        // Handle day checkbox clicks
+        document.querySelectorAll('.day-checkbox').forEach(label => {
+            label.addEventListener('click', function() {
+                const checkbox = this.querySelector('input[type="checkbox"]');
+                checkbox.checked = !checkbox.checked;
+                this.classList.toggle('selected', checkbox.checked);
+            });
+        });
+        
+        // Handle form submission
+        document.getElementById('alarmForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const timeInput = document.getElementById('alarmTime');
+            const labelInput = document.getElementById('alarmLabel');
+            const soundSelect = document.getElementById('alarmSound');
+            
+            // Get selected days
+            const selectedDays = [];
+            document.querySelectorAll('.day-checkbox input:checked').forEach(cb => {
+                selectedDays.push(cb.value);
+            });
+            
+            if (selectedDays.length === 0) {
+                alert('Please select at least one day');
+                return;
+            }
+            
+            // Create alarm
+            const alarm = {
+                id: Date.now(),
+                time: timeInput.value,
+                label: labelInput.value || 'Alarm',
+                days: selectedDays,
+                sound: soundSelect.value,
+                enabled: true
+            };
+            
+            alarms.push(alarm);
+            localStorage.setItem('testAlarms', JSON.stringify(alarms));
+            
+            // Reset form
+            this.reset();
+            document.querySelectorAll('.day-checkbox').forEach(label => {
+                label.classList.remove('selected');
+            });
+            
+            renderAlarms();
+            alert('Alarm added successfully!');
+        });
+        
+        // Render alarms
+        function renderAlarms() {
+            const alarmsList = document.getElementById('alarmsList');
+            
+            if (alarms.length === 0) {
+                alarmsList.innerHTML = '<p style="text-align: center; color: #666;">No alarms set. Add one above!</p>';
+                return;
+            }
+            
+            const alarmsHTML = alarms.map(alarm => {
+                const daysText = alarm.days.join(', ').toUpperCase();
+                return `
+                    <div class="alarm-item">
+                        <strong>${alarm.time}</strong> - ${alarm.label}<br>
+                        <small>Days: ${daysText} | Sound: ${alarm.sound}</small>
+                        <button onclick="deleteAlarm(${alarm.id})" style="float: right; width: auto; padding: 5px 10px; margin: 0;">Delete</button>
+                    </div>
+                `;
+            }).join('');
+            
+            alarmsList.innerHTML = alarmsHTML;
+        }
+        
+        // Delete alarm
+        function deleteAlarm(id) {
+            if (confirm('Delete this alarm?')) {
+                alarms = alarms.filter(a => a.id !== id);
+                localStorage.setItem('testAlarms', JSON.stringify(alarms));
+                renderAlarms();
+            }
+        }
+        
+        // Load existing alarms
+        renderAlarms();
+        
+        // Update current sound based on rotation
+        const sounds = ['Classic Beep', 'Gentle Chimes', 'Digital Bell', 'Morning Birds'];
+        const rotationSeed = Math.floor(Date.now() / (1000 * 60 * 60 * 24 * 2));
+        const currentSoundIndex = rotationSeed % sounds.length;
+        document.getElementById('currentSound').textContent = sounds[currentSoundIndex];
+    </script>
+</body>
+</html>
