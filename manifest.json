@@ -1,6 +1,6 @@
 {
-  "name": "Rotating Alarm Clock",
-  "short_name": "AlarmClock", 
+  "name": "VariAlarm",
+  "short_name": "VariAlarm", 
   "start_url": "./",
   "display": "standalone",
   "background_color": "#21808D",
