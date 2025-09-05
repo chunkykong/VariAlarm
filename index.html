@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotating Alarm Clock</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#21808D">
+    <meta name="description" content="Smart alarm clock with rotating sounds that change every 2 days">
+</head>
+<body>
+    <!-- Main Dashboard -->
+    <main class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <h1 class="app-title">Alarm Clock</h1>
+            <div class="header-controls">
+                <button class="btn btn--secondary btn--sm theme-toggle" id="themeToggle">
+                    <span class="theme-icon">🌙</span>
+                </button>
+                <button class="btn btn--secondary btn--sm settings-btn" id="settingsBtn">
+                    <span>⚙️</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Current Time Display -->
+        <section class="time-display">
+            <div class="current-time" id="currentTime">12:00:00</div>
+            <div class="current-date" id="currentDate">Friday, September 5, 2025</div>
+            <div class="next-alarm" id="nextAlarm">Next alarm in 6h 30m</div>
+        </section>
+
+        <!-- Rotating Sound Indicator -->
+        <section class="rotation-indicator">
+            <div class="rotation-card">
+                <div class="rotation-icon">🔄</div>
+                <div class="rotation-info">
+                    <div class="rotation-title">Current Alarm Sound</div>
+                    <div class="rotation-sound" id="currentRotationSound">Classic Beep</div>
+                    <div class="rotation-timer" id="rotationTimer">Changes in 1 day 5h</div>
+                </div>
+                <button class="btn btn--outline btn--sm preview-sound" id="previewSound">Preview</button>
+            </div>
+        </section>
+
+        <!-- Alarms List -->
+        <section class="alarms-section">
+            <div class="section-header">
+                <h2>Your Alarms</h2>
+                <div class="alarms-count" id="alarmsCount">2 active</div>
+            </div>
+            <div class="alarms-list" id="alarmsList">
+                <!-- Alarms will be dynamically inserted here -->
+            </div>
+        </section>
+
+        <!-- Floating Action Button -->
+        <button class="fab" id="addAlarmBtn">
+            <span class="fab-icon">+</span>
+        </button>
+    </main>
+
+    <!-- Add/Edit Alarm Modal -->
+    <div class="modal hidden" id="alarmModal">
+        <div class="modal-backdrop" id="modalBackdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Add New Alarm</h3>
+                <button class="modal-close" id="modalClose">×</button>
+            </div>
+            <div class="modal-body">
+                <!-- Time Picker -->
+                <div class="form-group">
+                    <label class="form-label">Time</label>
+                    <div class="time-picker">
+                        <div class="time-input-group">
+                            <input type="number" class="form-control time-input" id="hourInput" min="1" max="12" value="7">
+                            <span class="time-separator">:</span>
+                            <input type="number" class="form-control time-input" id="minuteInput" min="0" max="59" value="00">
+                            <select class="form-control ampm-select" id="ampmSelect">
+                                <option value="AM">AM</option>
+                                <option value="PM">PM</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Days Selection -->
+                <div class="form-group">
+                    <label class="form-label">Repeat Days</label>
+                    <div class="days-selector">
+                        <button type="button" class="day-btn" data-day="sun">S</button>
+                        <button type="button" class="day-btn" data-day="mon">M</button>
+                        <button type="button" class="day-btn" data-day="tue">T</button>
+                        <button type="button" class="day-btn" data-day="wed">W</button>
+                        <button type="button" class="day-btn" data-day="thu">T</button>
+                        <button type="button" class="day-btn" data-day="fri">F</button>
+                        <button type="button" class="day-btn" data-day="sat">S</button>
+                    </div>
+                </div>
+
+                <!-- Label -->
+                <div class="form-group">
+                    <label class="form-label" for="alarmLabel">Label (optional)</label>
+                    <input type="text" class="form-control" id="alarmLabel" placeholder="Wake up, Work, etc.">
+                </div>
+
+                <!-- Sound Selection -->
+                <div class="form-group">
+                    <label class="form-label" for="soundSelect">Alarm Sound</label>
+                    <select class="form-control" id="soundSelect">
+                        <option value="rotating">🔄 Use Rotating Sound (Recommended)</option>
+                        <option value="classic-beep.mp3">Classic Beep</option>
+                        <option value="gentle-chimes.mp3">Gentle Chimes</option>
+                        <option value="digital-bell.mp3">Digital Bell</option>
+                        <option value="morning-birds.mp3">Morning Birds</option>
+                        <option value="soft-piano.mp3">Soft Piano</option>
+                        <option value="ocean-waves.mp3">Ocean Waves</option>
+                        <option value="forest-dawn.mp3">Forest Dawn</option>
+                        <option value="electronic-pulse.mp3">Electronic Pulse</option>
+                        <option value="zen-bell.mp3">Zen Bell</option>
+                        <option value="rooster-call.mp3">Rooster Call</option>
+                    </select>
+                </div>
+
+                <!-- Volume Control -->
+                <div class="form-group">
+                    <label class="form-label">Volume</label>
+                    <div class="volume-control">
+                        <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="80">
+                        <span class="volume-value" id="volumeValue">80%</span>
+                    </div>
+                </div>
+
+                <!-- Snooze Duration -->
+                <div class="form-group">
+                    <label class="form-label" for="snoozeSelect">Snooze Duration</label>
+                    <select class="form-control" id="snoozeSelect">
+                        <option value="1">1 minute</option>
+                        <option value="5" selected>5 minutes</option>
+                        <option value="10">10 minutes</option>
+                        <option value="15">15 minutes</option>
+                        <option value="30">30 minutes</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn--secondary" id="cancelBtn">Cancel</button>
+                <button class="btn btn--primary" id="saveAlarmBtn">Save Alarm</button>
+                <button class="btn btn--outline delete-alarm hidden" id="deleteAlarmBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal hidden" id="settingsModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Settings</h3>
+                <button class="modal-close" id="settingsModalClose">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Theme</label>
+                    <select class="form-control" id="themeSelect">
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                        <option value="auto">Auto (System)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Sound Rotation</label>
+                    <div class="toggle-control">
+                        <input type="checkbox" class="toggle-input" id="rotationEnabled" checked>
+                        <label class="toggle-label" for="rotationEnabled">Enable automatic sound rotation</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Gradual Wake-up</label>
+                    <div class="toggle-control">
+                        <input type="checkbox" class="toggle-input" id="gradualWakeup" checked>
+                        <label class="toggle-label" for="gradualWakeup">Start quiet and gradually increase volume</label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn--primary" id="saveSettingsBtn">Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alarm Notification Modal -->
+    <div class="modal alarm-notification hidden" id="alarmNotification">
+        <div class="modal-backdrop"></div>
+        <div class="alarm-content">
+            <div class="alarm-animation">
+                <div class="alarm-circle"></div>
+                <div class="alarm-icon">⏰</div>
+            </div>
+            <div class="alarm-info">
+                <div class="alarm-time" id="notificationTime">7:00 AM</div>
+                <div class="alarm-label" id="notificationLabel">Wake Up</div>
+                <div class="alarm-sound-name" id="notificationSound">Classic Beep</div>
+            </div>
+            <div class="alarm-actions">
+                <button class="btn btn--secondary btn--lg snooze-btn" id="snoozeBtn">
+                    <span>😴 Snooze</span>
+                    <div class="snooze-time" id="snoozeTime">5 min</div>
+                </button>
+                <button class="btn btn--primary btn--lg stop-btn" id="stopBtn">
+                    <span>🛑 Stop</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio element for alarm sounds -->
+    <audio id="alarmAudio" preload="none"></audio>
+
+    <script src="app.js"></script>
+</body>
+</html>
